@@ -4,8 +4,9 @@ import type { Obstacle } from "../core/Obstacle";
 import type { Character } from "../core/Character";
 import type { Formation } from "../core/Formation";
 import type { Color } from "../core/Color";
+import type { GameBirds } from "../core/GameBirds";
 import { Camera } from "./Camera";
-import { fillCircle, fillPolygon, strokeCircle, strokePolyline } from "./shapes";
+import { drawText, fillCircle, fillPolygon, strokeCircle, strokePolyline } from "./shapes";
 
 /** Converts a 0..1 RGB color to a CSS rgb() string. */
 function colorToCss(c: Color): string {
@@ -97,6 +98,36 @@ export class Renderer {
       new Vec2(c.position.x + rcos, c.position.y - rsin),
     ].map((p) => this.camera.toPixel(p));
     fillPolygon(this.ctx, tri, css);
+  }
+
+  /** Draws the heads-up display: level/time on the left, score/total on the right, mode/win text. */
+  drawHud(game: GameBirds): void {
+    const w = this.ctx.canvas.width;
+    const boardColor = "rgb(0, 0, 102)"; // (0, 0, 0.4)
+
+    // Left board: level + time remaining.
+    this.ctx.fillStyle = boardColor;
+    this.ctx.fillRect(20, 80, 150, 56);
+    drawText(this.ctx, `level   ${game.gameLevel}`, 34, 104, "white");
+    const timeLeft = Math.max(0, Math.trunc(game.endTime - game.currTime));
+    drawText(this.ctx, `time    ${timeLeft}`, 34, 124, "rgb(255,255,0)");
+
+    // Right board: score + total.
+    this.ctx.fillStyle = boardColor;
+    this.ctx.fillRect(w - 170, 80, 150, 56);
+    drawText(this.ctx, `score   ${Math.trunc(game.score)}`, w - 156, 104, "white");
+    drawText(this.ctx, `total   ${game.totalScore}`, w - 156, 124, "white");
+
+    // Center: automatic-mode indicator.
+    if (!game.manualMode) {
+      this.ctx.fillStyle = "white";
+      this.ctx.fillRect(w / 2 - 55, 80, 110, 24);
+      drawText(this.ctx, "Automatic", w / 2 - 38, 97, "black");
+    }
+
+    if (game.gameEnded) {
+      drawText(this.ctx, "You Win!", w / 2 - 40, 160, "white", "28px monospace");
+    }
   }
 
   /** Debug visualization of the flyover path (the original only drew it for debugging). */

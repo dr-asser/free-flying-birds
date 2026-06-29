@@ -6,11 +6,14 @@ import type { Path } from "./Path";
 import type { Obstacle } from "./Obstacle";
 import type { Steerable } from "./Steerable";
 
-/** Manual control action chosen for the leader bird. */
+/**
+ * Manual control action for the leader bird. Values match the Java action codes set by
+ * handleKeyboard: LEFT key -> 1, RIGHT key -> 2, UP -> 3 (faster), DOWN -> 4 (slower).
+ */
 export const enum ManualAction {
   None = 0,
-  Right = 1,
-  Left = 2,
+  Left = 1,
+  Right = 2,
   Faster = 3,
   Slower = 4,
 }
@@ -51,10 +54,10 @@ export class Bird extends Character {
     const algo = new SteeringAlgorithm();
     let steering;
     switch (this.manualAction) {
-      case ManualAction.Right:
+      case ManualAction.Left:
         steering = algo.kinematicSeek(this, this.getTarget(true));
         break;
-      case ManualAction.Left:
+      case ManualAction.Right:
         steering = algo.kinematicSeek(this, this.getTarget(false));
         break;
       case ManualAction.Faster: {

@@ -4,6 +4,8 @@
   "private": true,
   "type": "module",
   "description": "TypeScript/HTML5 Canvas port of the LWJGL Java steering & flocking demo.",
+  "license": "MIT",
+  "author": "Asser Tantawi",
   "scripts": {
     "dev": "vite",
     "build": "tsc --noEmit && vite build",

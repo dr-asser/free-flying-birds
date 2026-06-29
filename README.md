@@ -66,3 +66,7 @@ A workflow at `.github/workflows/deploy.yml` builds and publishes `dist/` on eve
 3. In the repo: **Settings → Pages → Build and deployment → Source: GitHub Actions**.
 
 The site publishes at `https://<user>.github.io/free-flying-birds/`.
+
+## License
+
+[MIT](LICENSE) © 2026 Asser Tantawi

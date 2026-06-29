@@ -73,7 +73,7 @@ function render(): void {
     `arrows: steer/speed · A auto · M manual · F formation · N next level · D debug · R restart`,
     12,
     canvas!.height - 14,
-    "rgba(255,255,255,0.7)",
+    "rgba(0,0,60,0.75)",
   );
 }
 

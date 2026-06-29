@@ -1,4 +1,5 @@
 import { Vec2 } from "../core/Vec2";
+import { World } from "../core/world";
 
 /**
  * World -> canvas-pixel transform. Replaces the original `glOrtho(100, 1100, 550, 50, 1, -1)`.
@@ -9,17 +10,19 @@ import { Vec2 } from "../core/Vec2";
  *
  * World coordinates outside the visible rectangle are still valid (birds spawn off-screen and are
  * clamped to the 1200x600 window bounds, not the visible rect) — matching the original behavior.
+ *
+ * Layout constants come from `core/world.ts` so core and render share one coordinate space.
  */
 export class Camera {
   // Visible world rectangle (matches glOrtho left/right/top/bottom).
-  static readonly WORLD_LEFT = 100;
-  static readonly WORLD_RIGHT = 1100;
-  static readonly WORLD_TOP = 50;
-  static readonly WORLD_BOTTOM = 550;
+  static readonly WORLD_LEFT = World.XMIN;
+  static readonly WORLD_RIGHT = World.XMAX;
+  static readonly WORLD_TOP = World.YMIN;
+  static readonly WORLD_BOTTOM = World.YMAX;
 
   // Full game-world / window bounds (used for boundary clamping elsewhere).
-  static readonly GAME_WIDTH = 1200;
-  static readonly GAME_HEIGHT = 600;
+  static readonly GAME_WIDTH = World.WIDTH;
+  static readonly GAME_HEIGHT = World.HEIGHT;
 
   private readonly worldWidth = Camera.WORLD_RIGHT - Camera.WORLD_LEFT;
   private readonly worldHeight = Camera.WORLD_BOTTOM - Camera.WORLD_TOP;

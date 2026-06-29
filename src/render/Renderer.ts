@@ -16,7 +16,7 @@ function colorToCss(c: Color): string {
 
 /** Colors matching the original game. */
 const COLORS = {
-  background: "rgb(135, 206, 235)", // sky blue (was red rgb(204,0,0) in the original)
+  background: "rgb(56, 128, 200)", // deeper sky blue (was red rgb(204,0,0) in the original)
   obstacleUncleared: "rgb(255, 128, 0)", // (1, 0.5, 0)
   obstacleCleared: "rgb(0, 255, 0)", // (0, 1, 0)
   flyoverCircle: "rgb(255, 255, 255)",

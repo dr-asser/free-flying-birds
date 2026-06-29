@@ -1,5 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { GameBirds } from "./GameBirds";
+import { ManualAction } from "./Bird";
 
 describe("GameBirds setup", () => {
   it("starts on level 1 in manual mode with 10 birds over 5 triangles", () => {
@@ -59,6 +60,34 @@ describe("GameBirds.setManualMode", () => {
     for (const bird of g.formation.birds) {
       expect(bird.maxSpeed).toBeCloseTo(bird.isLeader ? 30 : 30 * g.formation.followerSpeedFactor);
     }
+  });
+});
+
+describe("GameBirds manual control", () => {
+  it("Faster/Slower change the leader's speed", () => {
+    const g = new GameBirds(1);
+    const lead = g.formation.getLeadBird()!;
+    const base = lead.maxSpeed;
+
+    g.setLeaderAction(ManualAction.Faster);
+    g.update(1 / 40);
+    expect(lead.maxSpeed).toBeGreaterThan(base);
+
+    g.setLeaderAction(ManualAction.Slower);
+    g.update(1 / 40);
+    g.setLeaderAction(ManualAction.Slower);
+    g.update(1 / 40);
+    expect(lead.maxSpeed).toBeLessThan(base + g.formation.getLeadBird()!.deltaSpeed);
+  });
+
+  it("Left/Right turn the leader's heading", () => {
+    const g = new GameBirds(1);
+    const lead = g.formation.getLeadBird()!;
+    const angle0 = lead.velocity.getAngle();
+
+    g.setLeaderAction(ManualAction.Left);
+    g.update(1 / 40);
+    expect(lead.velocity.getAngle()).not.toBeCloseTo(angle0);
   });
 });
 

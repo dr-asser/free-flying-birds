@@ -1,8 +1,16 @@
 import { Vec2 } from "../core/Vec2";
 import type { Environment } from "../core/Environment";
 import type { Obstacle } from "../core/Obstacle";
+import type { Character } from "../core/Character";
+import type { Formation } from "../core/Formation";
+import type { Color } from "../core/Color";
 import { Camera } from "./Camera";
-import { fillPolygon, strokeCircle, strokePolyline } from "./shapes";
+import { fillCircle, fillPolygon, strokeCircle, strokePolyline } from "./shapes";
+
+/** Converts a 0..1 RGB color to a CSS rgb() string. */
+function colorToCss(c: Color): string {
+  return `rgb(${Math.round(c.r * 255)}, ${Math.round(c.g * 255)}, ${Math.round(c.b * 255)})`;
+}
 
 /** Colors matching the original game. */
 const COLORS = {
@@ -56,6 +64,39 @@ export class Renderer {
     );
     const radius = this.camera.scaleX(obstacle.acceptedRange);
     strokeCircle(this.ctx, center.x, center.y, radius, COLORS.flyoverCircle);
+  }
+
+  /**
+   * Draws the flock: followers and dead birds always, the (normally invisible) leader only when
+   * `showLeader` is set. Mirrors the original Formation.draw, which never drew the leader.
+   */
+  drawFlock(formation: Formation, showLeader = false): void {
+    for (const bird of formation.birds) {
+      if (showLeader || !bird.isLeader) {
+        this.drawCharacter(bird);
+      }
+    }
+    for (const bird of formation.deadBirds) {
+      this.drawCharacter(bird);
+    }
+  }
+
+  /** Draws a character as a filled circle with a triangular heading indicator. */
+  private drawCharacter(c: Character): void {
+    const center = this.camera.toPixel(c.position);
+    const radius = this.camera.scaleX(c.radius);
+    const css = colorToCss(c.color);
+    fillCircle(this.ctx, center.x, center.y, radius, css);
+
+    // Orientation triangle (vertices computed in world space, then projected).
+    const rsin = c.radius * Math.sin(c.orientation);
+    const rcos = c.radius * Math.cos(c.orientation);
+    const tri = [
+      new Vec2(c.position.x + 2 * rsin, c.position.y + 2 * rcos),
+      new Vec2(c.position.x - rcos, c.position.y + rsin),
+      new Vec2(c.position.x + rcos, c.position.y - rsin),
+    ].map((p) => this.camera.toPixel(p));
+    fillPolygon(this.ctx, tri, css);
   }
 
   /** Debug visualization of the flyover path (the original only drew it for debugging). */

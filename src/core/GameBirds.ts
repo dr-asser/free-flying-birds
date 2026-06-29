@@ -1,9 +1,10 @@
 import { Vec2 } from "./Vec2";
 import { Environment } from "./Environment";
-import { DynamicQuadFormation } from "./DynamicQuadFormation";
+import { SlotFormation } from "./SlotFormation";
+import { makeFormation } from "./formations";
 import { Bird, ManualAction } from "./Bird";
 import { Rng } from "./rng";
-import { ObstacleType } from "./types";
+import { ObstacleType, FormationType } from "./types";
 
 /**
  * The game state machine. Port of Java `GameBirds` (the simulation half — rendering and raw
@@ -31,9 +32,10 @@ export class GameBirds {
 
   currTime = 0;
   gameEnded = false;
+  formationType: FormationType = FormationType.Quad;
 
   env!: Environment;
-  formation!: DynamicQuadFormation;
+  formation!: SlotFormation;
   private readonly rng: Rng;
 
   constructor(seed = 1) {
@@ -109,7 +111,7 @@ export class GameBirds {
     const gapFactor = 0.5;
 
     this.env = new Environment(numObstacles, obstacleType, gapFactor, this.rng);
-    this.formation = new DynamicQuadFormation(this.env);
+    this.formation = makeFormation(this.formationType, this.env);
 
     for (let i = 0; i < this.numBirds; i++) {
       const b = new Bird();
@@ -146,6 +148,35 @@ export class GameBirds {
     }
 
     this.manualMode = isManual;
+  }
+
+  /** Switches the follower layout live, keeping the current birds (no level reset). */
+  setFormationType(type: FormationType): void {
+    this.formationType = type;
+    const previous = this.formation;
+    this.formation = makeFormation(type, this.env);
+    this.formation.birds = previous.birds;
+    this.formation.deadBirds = previous.deadBirds;
+  }
+
+  /** Cycles to the next follower layout. */
+  cycleFormation(): void {
+    const next = ((this.formationType + 1) % 3) as FormationType;
+    this.setFormationType(next);
+  }
+
+  /** Ends the current level immediately and advances to the next (or wins after the hard level). */
+  skipToNextLevel(): void {
+    this.totalScore += this.score;
+    this.score = 0;
+    this.numTrials = 0;
+    this.gameLevel++;
+    if (this.gameLevel > this.maxGameLevels) {
+      this.gameLevel = this.maxGameLevels;
+      this.gameEnded = true;
+    } else {
+      this.startGameLevel(this.gameLevel);
+    }
   }
 
   /** Counts cleared obstacles, latching newly-passed ones against the leader (Environment port). */

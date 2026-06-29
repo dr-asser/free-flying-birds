@@ -1,6 +1,8 @@
 import { describe, it, expect } from "vitest";
 import { Formation } from "./Formation";
 import { DynamicQuadFormation } from "./DynamicQuadFormation";
+import { VeeFormation } from "./VeeFormation";
+import { LineFormation } from "./LineFormation";
 import { Bird } from "./Bird";
 import { Environment } from "./Environment";
 import { Obstacle } from "./Obstacle";
@@ -81,16 +83,30 @@ describe("Formation.birdHitObstacle", () => {
 });
 
 describe("DynamicQuadFormation", () => {
-  it("sizes the grid to ceil(sqrt(numFollowers))", () => {
+  it("lays followers in a sqrt-sized grid", () => {
     const f = new DynamicQuadFormation(makeEnv());
-    // @ts-expect-error access private for testing
-    const sideOf = () => f.side as number;
-    f.addBird(new Bird()); // leader, 0 followers
-    expect(sideOf()).toBe(0);
-    for (let i = 0; i < 4; i++) f.addBird(new Bird()); // 4 followers -> side 2
-    expect(sideOf()).toBe(2);
-    f.addBird(new Bird()); // 5 followers -> ceil(sqrt(5)) = 3
-    expect(sideOf()).toBe(3);
+    expect(f.slotOffsets(0)).toHaveLength(0);
+    expect(f.slotOffsets(4)).toHaveLength(4); // 2x2 grid
+    expect(f.slotOffsets(5)).toHaveLength(5); // side 3, first 5 slots used
+    // first slot sits one gap behind the leader
+    expect(f.slotOffsets(4)[0].x).toBeCloseTo(f.gap);
+  });
+
+  it("Vee formation alternates left/right arms growing in depth", () => {
+    const f = new VeeFormation(makeEnv());
+    const o = f.slotOffsets(4);
+    expect(o).toHaveLength(4);
+    expect(o[0].y).toBeLessThan(0); // first follower on the left arm
+    expect(o[1].y).toBeGreaterThan(0); // second on the right arm
+    expect(o[2].x).toBeGreaterThan(o[0].x); // deeper pair is further behind
+  });
+
+  it("Line formation trails straight behind the leader", () => {
+    const f = new LineFormation(makeEnv());
+    const o = f.slotOffsets(3);
+    expect(o.map((v) => v.y)).toEqual([0, 0, 0]);
+    expect(o[0].x).toBeLessThan(o[1].x);
+    expect(o[1].x).toBeLessThan(o[2].x);
   });
 
   it("flies the flock rightward along the path in automatic mode without errors", () => {

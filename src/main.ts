@@ -25,11 +25,20 @@ const keyboard = new Keyboard();
 let seed = 1;
 let game = new GameBirds(seed);
 
+let showDebug = false;
+
 keyboard.onPress("KeyA", () => game.setManualMode(false));
 keyboard.onPress("KeyM", () => game.setManualMode(true));
+keyboard.onPress("KeyF", () => game.cycleFormation());
+keyboard.onPress("KeyN", () => game.skipToNextLevel());
+keyboard.onPress("KeyD", () => {
+  showDebug = !showDebug;
+});
 keyboard.onPress("KeyR", () => {
   seed++;
+  const prevFormation = game.formationType;
   game = new GameBirds(seed);
+  game.setFormationType(prevFormation);
 });
 
 /** Translates the held arrow keys into a leader action (left takes priority, as in the original). */
@@ -52,13 +61,16 @@ function update(dt: number): void {
 function render(): void {
   renderer.clear();
   renderer.drawEnvironment(game.env, game.manualMode);
-  // Leader is the invisible player; followers and dead birds are drawn.
-  renderer.drawFlock(game.formation, /* showLeader */ false);
+  // Leader is the invisible player; followers and dead birds are drawn (leader shown in debug).
+  renderer.drawFlock(game.formation, /* showLeader */ showDebug);
+  if (showDebug) {
+    renderer.drawDebug(game);
+  }
   renderer.drawHud(game);
 
   drawText(
     ctx!,
-    `arrows: steer / speed · A automatic · M manual · R restart`,
+    `arrows: steer/speed · A auto · M manual · F formation · N next level · D debug · R restart`,
     12,
     canvas!.height - 14,
     "rgba(255,255,255,0.7)",

@@ -1,6 +1,8 @@
 import { describe, it, expect } from "vitest";
 import { GameBirds } from "./GameBirds";
 import { ManualAction } from "./Bird";
+import { FormationType } from "./types";
+import { VeeFormation } from "./VeeFormation";
 
 describe("GameBirds setup", () => {
   it("starts on level 1 in manual mode with 10 birds over 5 triangles", () => {
@@ -88,6 +90,47 @@ describe("GameBirds manual control", () => {
     g.setLeaderAction(ManualAction.Left);
     g.update(1 / 40);
     expect(lead.velocity.getAngle()).not.toBeCloseTo(angle0);
+  });
+});
+
+describe("GameBirds formation selection", () => {
+  it("swaps the formation live while keeping the same birds", () => {
+    const g = new GameBirds(1);
+    const birdsBefore = g.formation.birds;
+    g.setFormationType(FormationType.Vee);
+    expect(g.formationType).toBe(FormationType.Vee);
+    expect(g.formation).toBeInstanceOf(VeeFormation);
+    expect(g.formation.birds).toBe(birdsBefore); // same birds, no reset
+  });
+
+  it("cycles Quad -> Vee -> Line -> Quad", () => {
+    const g = new GameBirds(1);
+    expect(g.formationType).toBe(FormationType.Quad);
+    g.cycleFormation();
+    expect(g.formationType).toBe(FormationType.Vee);
+    g.cycleFormation();
+    expect(g.formationType).toBe(FormationType.Line);
+    g.cycleFormation();
+    expect(g.formationType).toBe(FormationType.Quad);
+  });
+});
+
+describe("GameBirds.skipToNextLevel", () => {
+  it("advances to the next level immediately", () => {
+    const g = new GameBirds(1);
+    g.skipToNextLevel();
+    expect(g.gameLevel).toBe(2);
+    expect(g.env.obstacles).toHaveLength(10);
+    expect(g.numTrials).toBe(0);
+  });
+
+  it("ends the game when skipping past the hard level", () => {
+    const g = new GameBirds(1);
+    g.gameLevel = 3;
+    g.startGameLevel(3);
+    g.skipToNextLevel();
+    expect(g.gameEnded).toBe(true);
+    expect(g.gameLevel).toBe(g.maxGameLevels);
   });
 });
 

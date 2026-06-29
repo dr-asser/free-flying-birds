@@ -5,6 +5,7 @@ import type { Character } from "../core/Character";
 import type { Formation } from "../core/Formation";
 import type { Color } from "../core/Color";
 import type { GameBirds } from "../core/GameBirds";
+import { FORMATION_NAMES } from "../core/formations";
 import { Camera } from "./Camera";
 import { drawText, fillCircle, fillPolygon, strokeCircle, strokePolyline } from "./shapes";
 
@@ -125,8 +126,20 @@ export class Renderer {
       drawText(this.ctx, "Automatic", w / 2 - 38, 97, "black");
     }
 
+    drawText(this.ctx, `formation: ${FORMATION_NAMES[game.formationType]}`, 34, 152, "white");
+
     if (game.gameEnded) {
-      drawText(this.ctx, "You Win!", w / 2 - 40, 160, "white", "28px monospace");
+      drawText(this.ctx, "You Win!", w / 2 - 40, 200, "white", "28px monospace");
+    }
+  }
+
+  /** Debug overlay: the flyover path and each bird's velocity vector. Pair with showLeader=true. */
+  drawDebug(game: GameBirds): void {
+    this.drawPath(game.env);
+    for (const bird of game.formation.birds) {
+      const from = this.camera.toPixel(bird.position);
+      const to = this.camera.toPixel(Vec2.copy(bird.position).add(bird.velocity));
+      strokePolyline(this.ctx, [from, to], "rgba(0, 255, 255, 0.8)", 1);
     }
   }
 

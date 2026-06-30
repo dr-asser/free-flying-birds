@@ -1,12 +1,10 @@
 # Free Flying Birds
 
-A TypeScript + HTML5 Canvas port of a Java/LWJGL steering & flocking game. You pilot an
-(invisible) leader bird; a flock of followers trails it through procedurally generated obstacle
-courses, scoring by passing through the flyover circle above each obstacle.
+You pilot an (invisible) leader bird; a flock of followers trails it through procedurally generated
+obstacle courses, scoring by passing through the flyover circle above each obstacle.
 
-The original Java/LWJGL 2 version lives at [`../project`](../project) and is kept as reference.
-This port preserves the AI core (steering, flocking, formations, path following, obstacle geometry)
-as a canvas-free simulation module, with rendering and input handled separately.
+The AI core (steering, flocking, formations, path following, obstacle geometry) is a canvas-free
+simulation module, with rendering and input handled separately.
 
 ## Play
 

@@ -5,16 +5,16 @@ import { FormationType } from "./types";
 import { VeeFormation } from "./VeeFormation";
 
 describe("GameBirds setup", () => {
-  it("starts on level 1 in manual mode with 10 birds over 5 triangles", () => {
+  it("starts on level 1 in automatic mode with 10 birds over 5 triangles", () => {
     const g = new GameBirds(1);
     expect(g.gameLevel).toBe(1);
-    expect(g.manualMode).toBe(true);
+    expect(g.manualMode).toBe(false);
     expect(g.formation.birds).toHaveLength(10);
     expect(g.env.obstacles).toHaveLength(5);
     expect(g.endTime).toBe(g.gameTime);
 
     const lead = g.formation.getLeadBird()!;
-    expect(lead.isFreeFly).toBe(false); // manual mode -> leader is player-driven
+    expect(lead.isFreeFly).toBe(true); // automatic mode -> flock flies the path itself
   });
 });
 
@@ -68,6 +68,7 @@ describe("GameBirds.setManualMode", () => {
 describe("GameBirds manual control", () => {
   it("Faster/Slower change the leader's speed", () => {
     const g = new GameBirds(1);
+    g.setManualMode(true);
     const lead = g.formation.getLeadBird()!;
     const base = lead.maxSpeed;
 
@@ -84,6 +85,7 @@ describe("GameBirds manual control", () => {
 
   it("Left/Right turn the leader's heading", () => {
     const g = new GameBirds(1);
+    g.setManualMode(true);
     const lead = g.formation.getLeadBird()!;
     const angle0 = lead.velocity.getAngle();
 

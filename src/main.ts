@@ -20,8 +20,8 @@ const camera = new Camera(canvas.width, canvas.height);
 const renderer = new Renderer(ctx, camera);
 const keyboard = new Keyboard();
 
-// The game starts in manual mode (player controls the invisible leader). A toggles automatic
-// (the flock flies the path itself), M returns to manual, R restarts from level 1.
+// The game starts in automatic mode (the flock flies the path itself). M switches to manual
+// (player controls the invisible leader), A returns to automatic, R restarts from level 1.
 let seed = 1;
 let game = new GameBirds(seed);
 

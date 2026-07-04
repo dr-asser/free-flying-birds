@@ -17,7 +17,7 @@ import { ObstacleType, FormationType } from "./types";
  * automatic mode, along the flyover path. Driven one fixed timestep at a time via update(dt).
  */
 export class GameBirds {
-  manualMode = true;
+  manualMode = false;
   score = 0;
   totalScore = 0;
   totalBirdsLost = 0;

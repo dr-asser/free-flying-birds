@@ -13,6 +13,8 @@ npm install
 npm run dev      # then open the printed localhost URL and click the page to give it focus
 ```
 
+- The flock starts in **automatic mode**, flying the course on its own — press `M` any time to take
+  manual control of the leader (and `A` to hand it back).
 - **Three levels**: 5 triangles → 10 rectangles → 15 mixed obstacles. Pass through the white
   flyover circle above each obstacle to clear it (it turns green). Followers that hit an obstacle
   or the ground turn brown and fall. Each level has a 60-second timer and up to three rounds.
